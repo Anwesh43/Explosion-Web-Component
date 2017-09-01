@@ -86,3 +86,4 @@ class ExplosionContainer {
         },50)
     }
 }
+customElements.define('explosion-comp',ExplosionComponent)
