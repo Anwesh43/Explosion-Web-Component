@@ -5,6 +5,7 @@ class ExplosionComponent extends HTMLElement {
         this.img = document.createElement('canvas')
         const shadow = this.attachShadow({mode:'open'})
         shadow.appendChild(this.img)
+        this.explosionContainer = new ExplosionContainer(this)
     }
     render() {
         const canvas = document.createElement('canvas')
@@ -13,10 +14,16 @@ class ExplosionComponent extends HTMLElement {
         const context = canvas.getContext('2d')
         context.fillStyle = '#212121'
         context.fillRect(0,0,w,h)
+        this.explosionContainer.draw(context)
         this.img.src = canvas.toDataURL()
     }
     connectedCallback() {
         this.render()
+        this.img.onmousedown = (event)=>{
+            const x = event.offsetX
+            const y = event.offsetY
+            this.explosionContainer.createExploision(x,y)
+        }
     }
 }
 class Explosion {
@@ -58,6 +65,11 @@ class ExplosionContainer {
         if(this.explosions.length == 1) {
             this.startUpdatingExplosions()
         }
+    }
+    drawExplosions(context) {
+        this.explosions.forEach((explosion)=>{
+            explosion.draw(context)
+        })
     }
     startUpdatingExplosions() {
         const interval = setInterval(()=>{
