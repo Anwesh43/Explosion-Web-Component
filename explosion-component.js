@@ -1,8 +1,9 @@
 const w = window.innerWidth,h = window.innerHeight
+const n = 20
 class ExplosionComponent extends HTMLElement {
     constructor() {
         super()
-        this.img = document.createElement('canvas')
+        this.img = document.createElement('img')
         const shadow = this.attachShadow({mode:'open'})
         shadow.appendChild(this.img)
         this.explosionContainer = new ExplosionContainer(this)
@@ -14,7 +15,7 @@ class ExplosionComponent extends HTMLElement {
         const context = canvas.getContext('2d')
         context.fillStyle = '#212121'
         context.fillRect(0,0,w,h)
-        this.explosionContainer.draw(context)
+        this.explosionContainer.drawExplosions(context)
         this.img.src = canvas.toDataURL()
     }
     connectedCallback() {
@@ -37,19 +38,19 @@ class Explosion {
         context.save()
         context.globalAlpha = 1-(this.r/this.maxR)
         context.translate(this.x,this.y)
-        var deg = 3.6
+        var gapDeg = 360/n,deg = gapDeg
         context.fillStyle = '#d32f2f'
-        for(var i = 0;i<100;i++) {
+        for(var i = 0;i<n;i++) {
             const x = this.r*Math.cos(deg*Math.PI/180),y = this.r*Math.sin(deg*Math.PI/180)
             context.beginPath()
-            context.arc(x,y,r,0,2*Math.PI)
+            context.arc(x,y,2,0,2*Math.PI)
             context.fill()
-            deg += 3.6
+            deg += gapDeg
         }
         context.restore()
     }
     update() {
-        this.r += this.maxR/10
+        this.r += this.maxR/15
     }
     stopped() {
         return this.r > this.maxR
@@ -83,7 +84,7 @@ class ExplosionContainer {
                     }
                 }
             })
-        },50)
+        },10)
     }
 }
 customElements.define('explosion-comp',ExplosionComponent)
