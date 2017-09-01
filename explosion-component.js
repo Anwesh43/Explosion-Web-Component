@@ -28,6 +28,7 @@ class Explosion {
     }
     draw(context) {
         context.save()
+        context.globalAlpha = 1-(this.r/this.maxR)
         context.translate(this.x,this.y)
         var deg = 3.6
         context.fillStyle = '#d32f2f'
@@ -45,5 +46,31 @@ class Explosion {
     }
     stopped() {
         return this.r > this.maxR
+    }
+}
+class ExplosionContainer {
+    constructor(component) {
+        this.component = component
+        this.explosions = []
+    }
+    createExploision(x,y) {
+        this.explosions.push(new Explosion(x,y))
+        if(this.explosions.length == 1) {
+            this.startUpdatingExplosions()
+        }
+    }
+    startUpdatingExplosions() {
+        const interval = setInterval(()=>{
+            this.component.render()
+            this.explosions.forEach((explosion,index)=>{
+                explosion.update()
+                if(explosion.stopped()) {
+                    this.explosions.splice(index,1)
+                    if(this.explosions.length == 0) {
+                        clearInterval(interval)
+                    }
+                }
+            })
+        },50)
     }
 }
